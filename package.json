@@ -1,0 +1,27 @@
+{
+  "name": "morpionui",
+  "version": "1.0.0",
+  "description": "Un morpion avancé comme sur le sujet mais avec des fonctionnalités en plus",
+  "main": "morpion.py",
+  "scripts": {
+    "test": "python src/morpion.py",
+    "start": "python src/morpion.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blueskin8/MorpionUI.git"
+  },
+  "keywords": [
+    "morpion",
+    "ui",
+    "3d",
+    "avance",
+    "avancé"
+  ],
+  "author": "blueskin8",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blueskin8/MorpionUI/issues"
+  },
+  "homepage": "https://github.com/blueskin8/MorpionUI#readme"
+}
