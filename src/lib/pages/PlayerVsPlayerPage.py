@@ -4,10 +4,10 @@ from lib.components.Title import Title
 from lib.classes.Morpion import MorpionGame
 from time import sleep
 
-class PlayerVsIaPage:
+class PlayerVsPlayerPage:
     def __init__(self, page: ft.Page):
         self.size = 0
-        page.title = "Projet 4 - Morpion Avancé - Joueur contre IA"
+        page.title = "Projet 4 - Morpion Avancé - Joueur contre joueur"
         page.window_maximized = True
         page.bgcolor = "#282828"
         page.window_full_screen = True
@@ -19,7 +19,7 @@ class PlayerVsIaPage:
         page.add(
             Title(
                 current_page=page,
-                title="Joueur contre IA"
+                title="Joueur contre joueur"
             ),
             self.create_grid()
         )
@@ -35,7 +35,7 @@ class PlayerVsIaPage:
                         [
                             ft.Container(
                                 content=ft.Text(
-                                    value="Tour du joueur",
+                                    value="Tour du joueur blanc",
                                     size=40,
                                     color=ft.colors.WHITE,
                                     text_align=ft.TextAlign.CENTER,
@@ -51,14 +51,14 @@ class PlayerVsIaPage:
                                 width=500
                             )]),
                             ft.Row([self.create_button(4), self.create_button(5), self.create_button(6), self.size_button(1), ft.Text(
-                                value=f"Blanc : {self.game.white_pawns[0]} ◽, {self.game.white_pawns[1]} ◻️, {self.game.white_pawns[2]} ⬜",
+                                value="Blanc : 2 ◽, 2 ◻️, 2 ⬜",
                                 size=40,
                                 color=ft.colors.WHITE,
                                 text_align=ft.TextAlign.CENTER,
                                 width=500
                             )]),
                             ft.Row([self.create_button(7), self.create_button(8), self.create_button(9), self.size_button(2), ft.Text(
-                                value=f"Noir : {self.game.black_pawns[0]} ◾, {self.game.black_pawns[1]} ◼️, {self.game.black_pawns[2]} ⬛",
+                                value="Noir : 2 ◾, 2 ◼️, 2 ⬛",
                                 size=40,
                                 color=ft.colors.WHITE,
                                 text_align=ft.TextAlign.CENTER,
@@ -105,7 +105,7 @@ class PlayerVsIaPage:
                 text_align=ft.TextAlign.CENTER,
                 color=ft.colors.WHITE
             ),
-            on_click=lambda e: changePage(page=PlayerVsIaPage, current_page=self.page),
+            on_click=lambda e: changePage(page=PlayerVsPlayerPage, current_page=self.page),
         )
         self.page.controls[1].controls[0].content.update()
 
@@ -116,41 +116,25 @@ class PlayerVsIaPage:
         self.page.controls[1].controls[0].content.controls[3].controls[4].update()
 
     def on_click(self, event: ft.ControlEvent, case: int):
-        if self.game.state == "playing":
-            if self.game.player_turn(case=case, size=self.size):
-                if self.game.player == "b":
-                    self.update_remaining_pawns()
-                    self.game.state = "ia"
-                    self.page.controls[1].controls[0].content.controls[0].content.value = "L'IA réfléchit..."
-                    self.page.controls[1].controls[0].content.controls[0].content.update()
-                    for i in range(3):
-                        self.page.controls[1].controls[0].content.controls[i+1].controls[3].content.disabled = True
-                        self.page.controls[1].controls[0].content.controls[i+1].controls[3].content.update()
-                    if self.game.check_winner() == None:
-                        sleep(2)
-                        self.game.ia_turn()
-                        self.update_remaining_pawns()
-                        if self.game.check_winner() == None:
-                            self.page.controls[1].controls[0].content.controls[0].content.value = "Tour du joueur"
-                            self.page.controls[1].controls[0].content.controls[0].content.update()
-                            for i in range(3):
-                                self.page.controls[1].controls[0].content.controls[i+1].controls[3].content.disabled = False
-                            self.page.controls[1].controls[0].content.controls[self.size+1].controls[3].content.disabled = True
-                            for i in range(3):
-                                self.page.controls[1].controls[0].content.controls[i+1].controls[3].content.update()
-                            self.actualise_page()
-                            self.game.state = "playing"
-                        else: self.on_winner()
-                    else:
-                        self.on_winner()
+        if self.game.player == "w":
+            self.game.player_turn(case=case, size=self.size)
+            self.page.controls[1].controls[0].content.controls[0].content.value = "Tour du joueur noir"
+            self.page.controls[1].controls[0].content.controls[0].content.update()
+        else:
+            self.game.black_player_turn(case=case, size=self.size)
+            self.page.controls[1].controls[0].content.controls[0].content.value = "Tour du joueur blanc"
+            self.page.controls[1].controls[0].content.controls[0].content.update()
+        self.update_remaining_pawns()
+        self.actualise_page()
+        if self.game.check_winner() != None:
+            self.on_winner()
 
     def create_button(self, case: int):
         def oc(e):
             self.on_click(e, case)
 
         def oh(e):
-            if(self.game.state == "playing"):
-                self.on_hover_button(e, case)
+            self.on_hover_button(e, case)
 
         return ft.ElevatedButton(
             content=ft.Text(
@@ -201,8 +185,11 @@ class PlayerVsIaPage:
 
     def on_hover_button(self, event: ft.ControlEvent, case: int):
         button = event.control
-        if event.data == "true" and self.game.can_pose(case=case, size=self.size):
-            button.content.value = "◽" if self.size == 0 else ("◻️" if self.size == 1 else "⬜")
+        if event.data == "true":
+            if self.game.player == "w" and self.game.can_pose(case=case, size=self.size):
+                button.content.value = "◽" if self.size == 0 else ("◻️" if self.size == 1 else "⬜")
+            elif self.game.player == "b" and self.game.can_black_pose(case=case, size=self.size):
+                button.content.value = "◾" if self.size == 0 else ("◼️" if self.size == 1 else "⬛")
         else:
             button.content.value = self.game.get_visual(case)
         button.update()

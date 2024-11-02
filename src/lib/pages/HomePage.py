@@ -5,6 +5,7 @@ from lib.components.Title import Title
 
 from lib.pages.PlayerVsIaPage import PlayerVsIaPage
 from lib.pages.CreditsPage import CreditsPage
+from lib.pages.PlayerVsPlayerPage import PlayerVsPlayerPage
 
 class HomePage:
     def __init__(self, page: ft.Page):
@@ -34,6 +35,11 @@ class HomePage:
                         action=lambda e: changePage(PlayerVsIaPage, page),
                         current_page=page,
                         text="Joueur contre IA"
+                    ),
+                    HomeButton(
+                        action=lambda e: changePage(PlayerVsPlayerPage, page),
+                        current_page=page,
+                        text="Joueur contre joueur"
                     ),
                     HomeButton(
                         action=lambda e: changePage(CreditsPage, page),
